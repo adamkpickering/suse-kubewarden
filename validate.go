@@ -35,7 +35,7 @@ func validate(payload []byte) ([]byte, error) {
 		if isPalindrome(key) {
 			return kubewarden.RejectRequest(
 				kubewarden.Message(
-					fmt.Sprintf("\"%s\" is a palindrome, which is not allowed", key),
+					fmt.Sprintf("'%s' is a palindrome, which is not allowed", key),
 				),
 				kubewarden.Code(400),
 			)
