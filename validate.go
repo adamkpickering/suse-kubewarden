@@ -1,15 +1,19 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"strings"
+	"os"
 
-	//onelog "github.com/francoispqt/onelog"
+	onelog "github.com/francoispqt/onelog"
 	"github.com/kubewarden/gjson"
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 )
 
 func validate(payload []byte) ([]byte, error) {
+	// create logger
+	logger = onelog.New(os.Stdout, onelog.ALL)
+
 	// ensure we got valid json
 	if !gjson.ValidBytes(payload) {
 		return kubewarden.RejectRequest(
@@ -18,41 +22,25 @@ func validate(payload []byte) ([]byte, error) {
 		)
 	}
 
-	// build Settings struct from payload
-	//settings, err := NewSettingsFromValidationReq(payload)
-	//if err != nil {
-	//	return kubewarden.RejectRequest(
-	//		kubewarden.Message(err.Error()),
-	//		kubewarden.Code(400))
-	//}
+	// get labels as map
+	data := gjson.GetBytes(payload, "request.object.metadata.labels")
+	if !data.Exists() {
+		logger.Warn("cannot read labels from metadata: accepting request")
+		return kubewarden.AcceptRequest()
+	}
+	label_mappings := data.Map()
 
-	//data := gjson.GetBytes(
-	//	payload,
-	//	"request.object.metadata.labels")
-
-	//if !data.Exists() {
-	//	onelog.Warn("cannot read labels from metadata: accepting request")
-	//	return kubewarden.AcceptRequest()
-	//}
-	//name := data.String()
-
-	//onelog.DebugWithFields("validating ingress object", func(e onelog.Entry) {
-	//	namespace := gjson.GetBytes(payload, "request.object.metadata.namespace").String()
-	//	e.String("name", name)
-	//	e.String("namespace", namespace)
-	//})
-
-	//if settings.DeniedNames.Contains(name) {
-	//	onelog.InfoWithFields("rejecting ingress object", func(e onelog.Entry) {
-	//		e.String("name", name)
-	//		e.String("denied_names", settings.DeniedNames.String())
-	//	})
-
-	//	return kubewarden.RejectRequest(
-	//		kubewarden.Message(
-	//			fmt.Sprintf("The '%s' name is on the deny list", name)),
-	//		kubewarden.NoCode)
-	//}
+	// check label keys
+	for key, _ := range label_mappings {
+		if isPalindrome(key) {
+			return kubewarden.RejectRequest(
+				kubewarden.Message(
+					fmt.Sprintf("\"%s\" is a palindrome, which is not allowed", key),
+				),
+				kubewarden.Code(400),
+			)
+		}
+	}
 
 	return kubewarden.AcceptRequest()
 }
