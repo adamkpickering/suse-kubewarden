@@ -2,9 +2,11 @@ package main
 
 import (
 	"testing"
+
+	"github.com/kubewarden/gjson"
 )
 
-func TestParsingSettingsWithAllValuesProvidedFromValidationReq(t *testing.T) {
+func TestParseSettingsWithAValueProvided(t *testing.T) {
 	request := `
 	{
 		"request": "doesn't matter here",
@@ -15,56 +17,28 @@ func TestParsingSettingsWithAllValuesProvidedFromValidationReq(t *testing.T) {
 	`
 	rawRequest := []byte(request)
 
-	settings, err := NewSettingsFromValidationReq(rawRequest)
+	output, err := validateSettings(rawRequest)
 	if err != nil {
-		t.Errorf("Unexpected error %+v", err)
+		t.Errorf("Unexpected error: %w", err)
 	}
 
-	expected := []string{"foo", "bar"}
-	for _, exp := range expected {
-		if !settings.DeniedNames.Contains(exp) {
-			t.Errorf("Missing value %s", exp)
-		}
+	output_data := gjson.GetBytes(output, "valid")
+	if valid := output_data.Bool(); valid {
+		t.Errorf("Got %t, not false, in 'valid' key of output", valid)
 	}
 }
 
-func TestParsingSettingsWithNoValueProvided(t *testing.T) {
-	request := `
-	{
-		"request": "doesn't matter here",
-		"settings": {
-		}
-	}
-	`
+func TestParseSettingsWithNoValueProvided(t *testing.T) {
+	request := "{}"
 	rawRequest := []byte(request)
 
-	settings, err := NewSettingsFromValidationReq(rawRequest)
+	output, err := validateSettings(rawRequest)
 	if err != nil {
-		t.Errorf("Unexpected error %+v", err)
+		t.Errorf("Unexpected error: %w", err)
 	}
 
-	if settings.DeniedNames.Cardinality() != 0 {
-		t.Errorf("Expecpted DeniedNames to be empty")
-	}
-}
-
-func TestSettingsAreValid(t *testing.T) {
-	request := `
-	{
-	}
-	`
-	rawRequest := []byte(request)
-
-	settings, err := NewSettingsFromValidateSettingsPayload(rawRequest)
-	if err != nil {
-		t.Errorf("Unexpected error %+v", err)
-	}
-
-	valid, err := settings.Valid()
-	if !valid {
-		t.Errorf("Settings are reported as not valid")
-	}
-	if err != nil {
-		t.Errorf("Unexpected error %+v", err)
+	output_data := gjson.GetBytes(output, "valid")
+	if valid := output_data.Bool(); !valid {
+		t.Errorf("Got %t, not true, in 'valid' key of output", valid)
 	}
 }
