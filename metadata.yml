@@ -7,13 +7,12 @@ mutating: false
 contextAware: false
 executionMode: kubewarden-wapc
 annotations:
-  io.kubewarden.policy.title: policy-name
-  io.kubewarden.policy.description: Short description
-  io.kubewarden.policy.author: policy-author
-  io.kubewarden.policy.url: https://github.com/yourorg/policy-name
-  io.kubewarden.policy.source: https://github.com/yourorg/policy-name
+  io.kubewarden.policy.title: suse-kubewarden
+  io.kubewarden.policy.description: Prevent pods with palindrome label keys from being created
+  io.kubewarden.policy.author: Adam Pickering
+  io.kubewarden.policy.url: https://github.com/adamkpickering/suse-kubewarden
+  io.kubewarden.policy.source: https://github.com/adamkpickering/suse-kubewarden
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.usage: |
-    Long explaination.
-
-    **Note well:** this can be Markdown text
+    This policy is used to preven palindrom label keys
+    from being created.

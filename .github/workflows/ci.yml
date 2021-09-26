@@ -91,7 +91,7 @@ jobs:
     if: github.event.workflow_run.event != 'pull_request'
     runs-on: ubuntu-latest
     env:
-      OCI_TARGET: #TODO: change to something like ghcr.io/kubewarden/policies/safe-labels
+      OCI_TARGET: ghcr.io/adamkpickering/suse-kubewarden
       KWCTL_VERSION: v0.1.10
 
     steps:
@@ -157,8 +157,8 @@ jobs:
           asset_name: policy.wasm
           asset_content_type: application/wasm
 
-      - name: Notify policy-hub
-        uses: kubewarden/notify-policy-hub@main
-        with:
-          USERNAME: chimera-kube-bot
-          PAT: ${{ secrets.WORKFLOW_PAT }}
+      #- name: Notify policy-hub
+      #  uses: kubewarden/notify-policy-hub@main
+      #  with:
+      #    USERNAME: chimera-kube-bot
+      #    PAT: ${{ secrets.WORKFLOW_PAT }}
