@@ -3,17 +3,12 @@ package main
 import (
 	"fmt"
 	"strings"
-	"os"
 
-	onelog "github.com/francoispqt/onelog"
 	"github.com/kubewarden/gjson"
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 )
 
 func validate(payload []byte) ([]byte, error) {
-	// create logger
-	logger = onelog.New(os.Stdout, onelog.ALL)
-
 	// ensure we got valid json
 	if !gjson.ValidBytes(payload) {
 		return kubewarden.RejectRequest(
